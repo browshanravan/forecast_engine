@@ -5,6 +5,7 @@ from forecast_engine.src.utils import (
 import pandas as pd
 import matplotlib.pyplot as plt
 from prophet import Prophet
+import streamlit as st
 import os
 
 DATA_DIRECTORY_PATH= "/workspaces/data/"
@@ -26,6 +27,15 @@ DATA_GRANULARITY_OPTIONS={
 DATA_GRANULARITY= "daily"
 PREDICTION_PERIOD=30
 EXPECTED_ONE_FULL_CYCLE_PERIOD= 60
+
+
+
+
+st.title("The Forecast Engine App")
+st.header("")
+st.caption("This app is for demostration purposes only!")
+
+
 
 
 
