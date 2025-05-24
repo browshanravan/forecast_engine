@@ -31,9 +31,9 @@ EXPECTED_ONE_FULL_CYCLE_PERIOD= 60
 
 
 
-st.title("The Forecast Engine App")
-st.header("")
+st.title("Welcome to Forecast Engine App")
 st.caption("This app is for demostration purposes only!")
+st.header("")
 
 
 
