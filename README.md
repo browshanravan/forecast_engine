@@ -1,5 +1,5 @@
-# Devcontainers based project template
+# forecast_engine
 
-This project serves as demo purposes only and is used as a template.
+This project is being developed actively.
 
-The project can also be viewed through GitHub codespaces service.
+The aim of the project is to showcase how to use prophet to predict/forecast timeseries data.
