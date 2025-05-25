@@ -2,14 +2,13 @@ from forecast_engine.src.utils import (
     read_csv_file,
     timeseries_format_validity_checker,
     timeseries_date_granularity_validity_checker,
+    fit_model_to_data,
     )
-
 import pandas as pd
 import altair as alt
 import matplotlib.pyplot as plt
-from prophet import Prophet
 import streamlit as st
-import os
+
 
 
 NEW_TIME_SERIES_COLUM_NAME= "ds"
@@ -18,11 +17,15 @@ REQUIRED_TIMESERIES_DATA_DATE_FORMAT= "%d-%m-%Y"
 DATA_GRANULARITY_OPTIONS={
     "daily": "D",
     "weekly": "W",
-    "monthly": "M"
+    "monthly": "M",
+    "yearly": "Y"
 }
-
-PREDICTION_PERIOD=30
-EXPECTED_ONE_FULL_CYCLE_PERIOD= 60
+SMALLEST_UNITS={
+    "daily": "days",
+    "weekly": "weeks",
+    "monthly": "months",
+    "yearly": "years"
+}
 
 
 if "part_1" not in st.session_state:
@@ -35,12 +38,13 @@ st.title("Welcome to Forecast Engine App")
 st.caption("This app is for demostration purposes only!")
 st.header("")
 
+
+##Part 1 of data analysis
 uploaded_file = st.file_uploader(
     label="Choose a CSV file", 
     accept_multiple_files=False
 )
 
-##Part 1 of data analysis
 if uploaded_file:
     st.session_state["part_1"] = True
     df= read_csv_file(file_path= uploaded_file)
@@ -82,7 +86,6 @@ if uploaded_file:
                     )
                 df= df.set_index(NEW_TIME_SERIES_COLUM_NAME)
                 
-                
                 DATA_GRANULARITY = st.selectbox(
                     label= "Please select the granularity/resolution of your data",
                     options= list(DATA_GRANULARITY_OPTIONS.keys()),
@@ -100,8 +103,11 @@ if uploaded_file:
                         df= df.reset_index(drop=False)
                         df= df.sort_values(by=NEW_TIME_SERIES_COLUM_NAME, ascending=True)
                         
-                        if st.button("Generate Plot") == True:
+                        if st.button("Generate Data Plot"):
                             st.session_state["part_2"] = True
+
+                        #This is key otherwise the app will reset back to the button
+                        if st.session_state["part_1"] and st.session_state["part_2"]:
                             Chart= (alt.Chart(df.reset_index()).mark_line().encode(
                                 alt.X(NEW_TIME_SERIES_COLUM_NAME, title=TIME_SERIES_COLUM_NAME),
                                 alt.Y(NEW_DATA_COLUM_NAME, title=DATA_COLUM_NAME),
@@ -116,21 +122,38 @@ else:
     st.session_state["part_1"] = False
 
 
-##Part 2 of data analysis
-# if st.session_state["part_1"] and st.session_state["part_2"]:
-#     pass
+#Part 2 of data analysis
+if st.session_state["part_1"] and st.session_state["part_2"]:
+    EXPECTED_ONE_FULL_CYCLE_PERIOD = st.number_input(
+    label=f"Using the above plot please state roughly the number of `{SMALLEST_UNITS[DATA_GRANULARITY]}` it takes for a full cycle.  \nYou can move the plot around, zoom out and hover over it with your mouse to see the dates", 
+    value=None,
+    step= 1,
+    placeholder="Insert number..."
+    )
 
+    if EXPECTED_ONE_FULL_CYCLE_PERIOD != None: 
+        PREDICTION_PERIOD = st.number_input(
+        label=f"How many `{SMALLEST_UNITS[DATA_GRANULARITY]}` in the future do you want to predict?", 
+        value=None,
+        step= 1,
+        placeholder="Insert number..."
+        )
+        if PREDICTION_PERIOD != None:
+            EXPECTED_ONE_FULL_CYCLE_PERIOD= int(EXPECTED_ONE_FULL_CYCLE_PERIOD)
+            PREDICTION_PERIOD= int(PREDICTION_PERIOD)
+            
+            if st.button("Generate Future Plot") == True:
+                clf= fit_model_to_data(
+                    dranularity= DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY], 
+                    full_cycle= EXPECTED_ONE_FULL_CYCLE_PERIOD,
+                    dataframe= df
+                    )
 
-# clf= Prophet()
-# clf.add_seasonality(
-#     name=DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY], 
-#     period=EXPECTED_ONE_FULL_CYCLE_PERIOD, 
-#     fourier_order=5
-#     )
-# clf.fit(df)
-# future = clf.make_future_dataframe(periods=PREDICTION_PERIOD, freq=DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY])
-# forecast = clf.predict(future)
+                future = clf.make_future_dataframe(periods=PREDICTION_PERIOD, freq=DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY])
+                forecast = clf.predict(future)
+                fig= clf.plot(forecast, xlabel= TIME_SERIES_COLUM_NAME, ylabel= DATA_COLUM_NAME)
+                plt.axvline(x= forecast[NEW_TIME_SERIES_COLUM_NAME][df.shape[0]-1], color="red", label="Last data point", linewidth=2, linestyle="--")
+                plt.legend(loc="best")
+                plt.tight_layout()
+                st.pyplot(fig)
 
-# clf.plot(forecast, xlabel= TIME_SERIES_COLUM_NAME, ylabel= DATA_COLUM_NAME)
-# plt.tight_layout()
-# plt.show()

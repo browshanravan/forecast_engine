@@ -1,5 +1,6 @@
 import pandas as pd
 import streamlit as st
+from prophet import Prophet
 
 @st.cache_data(show_spinner= "Reading your data...")
 def read_csv_file(file_path):
@@ -26,3 +27,14 @@ def timeseries_date_granularity_validity_checker(stated_granularity, dataframe):
     return data_granularity_validity_status
 
 
+@st.cache_resource(show_spinner="Modelling the data...")
+def fit_model_to_data(dranularity, full_cycle, dataframe):
+    clf= Prophet()
+    clf.add_seasonality(
+    name= dranularity, 
+    period= full_cycle, 
+    fourier_order=5
+    )
+    clf.fit(dataframe)
+    
+    return clf
