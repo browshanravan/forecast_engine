@@ -46,66 +46,66 @@ uploaded_file = st.file_uploader(
 
 if uploaded_file:
     df= read_csv_file(file_path= uploaded_file)
-    st.write("Please select the date column. The date MUST be in the `DD-MM-YYYY` format")
-    TIME_SERIES_COLUM_NAME= st.multiselect(
+    ALL_COLUMNS= df.columns.tolist()
+    TIME_SERIES_COLUM_NAME= st.selectbox(
         label= "Please select the date column. The date MUST be in the `DD-MM-YYYY` format",
-        options= df.columns.tolist(),
+        options= ALL_COLUMNS,
         placeholder= "Date column ...",
-        default=None
+        index=None
         )
     
-    if TIME_SERIES_COLUM_NAME != []:
-        date_format_validity_status= timeseries_format_validity_checker(
-            required_format= REQUIRED_TIMESERIES_DATA_DATE_FORMAT, 
-            dataframe=df, 
-            date_column= TIME_SERIES_COLUM_NAME,
+if uploaded_file and TIME_SERIES_COLUM_NAME != None:
+    date_format_validity_status= timeseries_format_validity_checker(
+        required_format= REQUIRED_TIMESERIES_DATA_DATE_FORMAT, 
+        dataframe=df, 
+        date_column= TIME_SERIES_COLUM_NAME,
+        )
+
+    if not date_format_validity_status:
+        st.write("The date column is not in the `DD-MM-YYYY` required format. Please upload a correctly formatted file.")
+    
+    elif date_format_validity_status:
+        DATA_COLUM_NAME= st.selectbox(
+            label= "Please select the target column you wish to predict",
+            options= [i for i in ALL_COLUMNS if i != TIME_SERIES_COLUM_NAME],
+            placeholder= "Target column ...",
+            index=None
             )
-
-        if date_format_validity_status and TIME_SERIES_COLUM_NAME != []:
-            st.write("Please select the target column you wish to predict")
-            DATA_COLUM_NAME= st.multiselect(
-                label= "Please select the target column you wish to predict",
-                options= df.columns.tolist().remove(TIME_SERIES_COLUM_NAME),
-                placeholder= "Target column ...",
-                default=None
-                )
-            
-            if DATA_COLUM_NAME != [] and TIME_SERIES_COLUM_NAME != []:
-                df= df[[DATA_COLUM_NAME, TIME_SERIES_COLUM_NAME]]
-                df= df.rename(columns={
-                    TIME_SERIES_COLUM_NAME: NEW_TIME_SERIES_COLUM_NAME, 
-                    DATA_COLUM_NAME: NEW_DATA_COLUM_NAME
-                    })
-                df[NEW_TIME_SERIES_COLUM_NAME]= pd.to_datetime(
-                    df[NEW_TIME_SERIES_COLUM_NAME], 
-                    format=REQUIRED_TIMESERIES_DATA_DATE_FORMAT
-                    )
-                df= df.set_index(NEW_TIME_SERIES_COLUM_NAME)
-                
-                st.write("Please select the granularity/resolution of your data")
-                DATA_GRANULARITY = st.selectbox(
-                    label= "Please select the granularity/resolution of your data",
-                    options= list(DATA_GRANULARITY_OPTIONS.keys()),
-                    index=None,
-                    placeholder="Data granularity...",
-                )
-                
-                if DATA_GRANULARITY != []:
-                    data_granularity_validity_status= timeseries_date_granularity_validity_checker(
-                        stated_granularity= DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY], 
-                        dataframe=df
-                        )
-                    if data_granularity_validity_status:
-                        df= df.resample(DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY]).mean()
-                        df= df.reset_index(drop=False)
-                        df= df.sort_values(by=NEW_TIME_SERIES_COLUM_NAME, ascending=True)
-                        print(df.head())
-                    else:
-                        st.write("There are missing data points for the selected granularity. Please select another option.")
-
-        else:
-            st.write("The date column is not in the `DD-MM-YYYY` required format. Please upload a correctly formatted file.")
         
+        if DATA_COLUM_NAME != None:
+            df= df[[DATA_COLUM_NAME, TIME_SERIES_COLUM_NAME]]
+            df= df.rename(columns={
+                TIME_SERIES_COLUM_NAME: NEW_TIME_SERIES_COLUM_NAME, 
+                DATA_COLUM_NAME: NEW_DATA_COLUM_NAME
+                })
+            df[NEW_TIME_SERIES_COLUM_NAME]= pd.to_datetime(
+                df[NEW_TIME_SERIES_COLUM_NAME], 
+                format=REQUIRED_TIMESERIES_DATA_DATE_FORMAT
+                )
+            df= df.set_index(NEW_TIME_SERIES_COLUM_NAME)
+            
+            
+            DATA_GRANULARITY = st.selectbox(
+                label= "Please select the granularity/resolution of your data",
+                options= list(DATA_GRANULARITY_OPTIONS.keys()),
+                placeholder="Data granularity...",
+                index=None,
+            )
+            
+            if DATA_GRANULARITY != None:
+                data_granularity_validity_status= timeseries_date_granularity_validity_checker(
+                    stated_granularity= DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY], 
+                    dataframe=df
+                    )
+                if data_granularity_validity_status:
+                    df= df.resample(DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY]).mean()
+                    df= df.reset_index(drop=False)
+                    df= df.sort_values(by=NEW_TIME_SERIES_COLUM_NAME, ascending=True)
+                    st.write(df.head())
+                else:
+                    st.write("There are missing data points for the selected granularity. Please select another option.")
+
+
             
 
 

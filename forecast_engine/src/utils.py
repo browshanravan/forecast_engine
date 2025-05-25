@@ -1,10 +1,10 @@
 import pandas as pd
+import streamlit as st
 
-
+@st.cache_data(show_spinner= "Reading your data...")
 def read_csv_file(file_path):
     df= pd.read_csv(file_path)
     return df.dropna(how="any", axis="rows")
-
 
 
 def timeseries_format_validity_checker(required_format, dataframe, date_column):
@@ -15,6 +15,7 @@ def timeseries_format_validity_checker(required_format, dataframe, date_column):
         date_format_validity_status= False
     
     return date_format_validity_status
+
 
 def timeseries_date_granularity_validity_checker(stated_granularity, dataframe):
     try:
