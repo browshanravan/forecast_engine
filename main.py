@@ -10,15 +10,8 @@ from prophet import Prophet
 import streamlit as st
 import os
 
-# DATA_DIRECTORY_PATH= "/workspaces/data/"
-# FILE_NAME= [
-#     "stationary_sales_data_date_valid.csv",
-#     "non_stationary_sales_data_date_valid.csv", 
-#     "non_stationary_sales_data_date_invalid.csv",
-#     ][1]
-# TIME_SERIES_COLUM_NAME= "date_time"
+
 NEW_TIME_SERIES_COLUM_NAME= "ds"
-# DATA_COLUM_NAME= "sales"
 NEW_DATA_COLUM_NAME= "y"
 REQUIRED_TIMESERIES_DATA_DATE_FORMAT= "%d-%m-%Y"
 DATA_GRANULARITY_OPTIONS={
@@ -26,7 +19,7 @@ DATA_GRANULARITY_OPTIONS={
     "weekly": "W",
     "monthly": "M"
 }
-# DATA_GRANULARITY= "daily"
+
 PREDICTION_PERIOD=30
 EXPECTED_ONE_FULL_CYCLE_PERIOD= 60
 
@@ -106,23 +99,7 @@ if uploaded_file and TIME_SERIES_COLUM_NAME != None:
                     st.write("There are missing data points for the selected granularity. Please select another option.")
 
 
-            
 
-
-
-
-
-
-
-
-
-
-
-
-# df= df.set_index(NEW_TIME_SERIES_COLUM_NAME)
-# df= df.resample(DATA_GRANULARITY_OPTIONS[DATA_GRANULARITY]).mean()
-# df= df.reset_index(drop=False)
-# df= df.sort_values(by=NEW_TIME_SERIES_COLUM_NAME, ascending=True)
 
 # clf= Prophet()
 # clf.add_seasonality(

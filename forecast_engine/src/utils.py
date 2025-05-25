@@ -18,10 +18,11 @@ def timeseries_format_validity_checker(required_format, dataframe, date_column):
 
 
 def timeseries_date_granularity_validity_checker(stated_granularity, dataframe):
-    try:
-        dataframe.resample(stated_granularity).mean()
+    if dataframe.resample(stated_granularity).mean().isna().sum().values == 0:
         data_granularity_validity_status= True
-    except:
+    else:
         data_granularity_validity_status= False
     
     return data_granularity_validity_status
+
+
