@@ -76,7 +76,7 @@ Use cases include sales forecasting, web traffic prediction, energy demand plann
 
 1. Clone the repo:  
    ```bash
-   git clone https://github.com/behzadrowshanravan/forecast_engine.git
+   git clone https://github.com/browshanravan/forecast_engine.git
    cd forecast_engine
    ```
 2. Install dependencies via pip:  
