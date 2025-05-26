@@ -1,5 +1,7 @@
 # forecast_engine
 
+If you want to see a generativeAI version of this README.md file which was created using my [README_genie](https://github.com/browshanravan/README_genie), please click [here](https://github.com/browshanravan/README_genie/blob/main/GENERATIVE_README.md)
+
 ## About this project
 The aim of the project is to showcase how to use [prophet python package](https://facebook.github.io/prophet/) (developed by facebook) and [streamlit](https://streamlit.io) to predict/forecast univariate time series data.
 
