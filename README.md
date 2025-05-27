@@ -67,7 +67,7 @@ Use cases include sales forecasting, web traffic prediction, energy demand plann
 
 ### Prerequisites
 
-- Python 3.10  
+- Python 3.10 or higher
 - [pip](https://pip.pypa.io/)  
 - (Optional) [Conda](https://docs.conda.io/) for environment management  
 - Docker & VS Code (for Dev Container setup)  
